@@ -30,8 +30,6 @@ module Grape
         # breaking changes.
         def reject?(val)
           case val
-          when Array, Hash
-            type == String
           when String
             type == Hash
           else
