@@ -1,0 +1,39 @@
+# frozen_string_literal: true
+
+module Grape
+  module Util
+    class StackableValues < BaseInheritable
+      EMPTY = [].freeze
+
+      # Even if there is no value, an empty (frozen) array will be returned.
+      def [](name)
+        inherited_value = @inherited_values[name]
+        new_value = @new_values && @new_values[name]
+
+        return new_value || EMPTY unless inherited_value
+
+        concat_values(inherited_value, new_value)
+      end
+
+      def []=(name, value)
+        @new_values ||= {}
+        @new_values[name] ||= []
+        @new_values[name].push value
+      end
+
+      def to_hash
+        keys.to_h do |key|
+          [key, self[key]]
+        end
+      end
+
+      protected
+
+      def concat_values(inherited_value, new_value)
+        return inherited_value unless new_value
+
+        inherited_value + new_value
+      end
+    end
+  end
+end
